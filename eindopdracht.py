@@ -16,15 +16,16 @@ def create_molecules():
     """ Creates the molecules """
     global GUANINE
 
-    GTP = pdb.PDBMolecule('{}/pdb/gtp.pdb'.format(SETTINGS.AppLocation), center=True)
-    GTP.rotate([1, 1, 1], [pi * 1.5, pi, pi / 2])
-    GUANINE = GTP.divide([11, 12, 13, 14, 15, 16, 17, 18], 'phosphate',
+    GUANINE = pdb.PDBMolecule('{}/pdb/gtp.pdb'.format(SETTINGS.AppLocation), center=True)
+    GUANINE.rotate([1, 1, 1], [pi * 1.5, pi, pi / 2])
+    GUANINE.divide([11, 12, 13, 14, 15, 16, 17, 18], 'phosphate',
                          offset=[0, 0, 0])  # removes two phosphate groups to create guanine nucleotide
 
 
 def frame(step):
     """ Renders an animation in which the molecules are split
     and rotate one full circle around its axis """
+
     # Feedback to user in terminal about render status
     curr_time = step / eval(SETTINGS.NumberFrames) * eval(SETTINGS.FrameTime)
     logger.info(" @Time: %.3fs, Step: %d", curr_time, step)
