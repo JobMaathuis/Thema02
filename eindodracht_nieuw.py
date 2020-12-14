@@ -9,7 +9,7 @@ __author__ = 'Joukje Kloosterman, Job Maathuis'
 import sys
 from math import pi
 from pypovray import pypovray, SETTINGS, models, pdb, logger
-from vapory import Scene, Camera
+from vapory import Scene
 
 
 def create_molecules():
@@ -54,15 +54,14 @@ def frame(step):
     # if step in range(n_frames // 5 * 4, n_frames):
 
     # Return the Scene object for rendering
-    return Scene(Camera('location', [0, 8, -50], 'look_at', [0, 2, -5]),
-                 objects=[models.default_light] + GUANINE.povray_molecule + ADENINE.povray_molecule
-                         + CYTOSINE.povray_molecule + URACIL.povray_molecule)
+    return Scene(models.floor_camera,
+                 objects=[models.default_light] + GUANINE.povray_molecule)
 
 
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(0, 3))
+    pypovray.render_scene_to_png(frame)
     return 0
 
 
