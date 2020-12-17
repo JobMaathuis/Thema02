@@ -38,6 +38,9 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
     distance = start - end
     distance_per_frame = distance / one_sixth_of_scene
 
+    URACIL_ONE.rotate([0, 0, 1], [0, 0, -pi])
+    ADENINE.rotate([1, 0, 0], [pi + pi / 3, 0, 0])
+
     if step_in_frame in range(0, one_sixth_of_scene):
         uracil_x_location = step_in_frame * distance_per_frame - start
         URACIL_ONE.move_to([uracil_x_location, -20, 0])
@@ -116,7 +119,7 @@ def frame(step):
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(0, 40))
+    pypovray.render_scene_to_mp4(frame, range(39, 40))
     return 0
 
 
