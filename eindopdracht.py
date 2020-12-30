@@ -7,6 +7,7 @@
 __author__ = 'Joukje Kloosterman, Job Maathuis'
 
 import sys
+import random
 from math import pi
 from pypovray import pypovray, SETTINGS, models, pdb, logger
 from vapory import Scene, Camera
@@ -22,6 +23,22 @@ def create_molecules():
     URACIL_ONE = pdb.PDBMolecule('{}/pdb/UMP.pdb'.format(SETTINGS.AppLocation), offset=[-100, 0, 0])
     URACIL_TWO = pdb.PDBMolecule('{}/pdb/UMP.pdb'.format(SETTINGS.AppLocation), offset=[-100, 0, 0])
 
+def create_random_nucl():
+    """" """
+    pdb_guanine = pdb.PDBMolecule('{}/pdb/GMP.pdb'.format(SETTINGS.AppLocation), offset=[-100, 0, 0])
+    pdb_adenine = pdb.PDBMolecule('{}/pdb/AMP.pdb'.format(SETTINGS.AppLocation), offset=[-100, 0, 0])
+    pdb_cytosine = pdb.PDBMolecule('{}/pdb/CMP.pdb'.format(SETTINGS.AppLocation), offset=[-100, 0, 0])
+    pdb_uracil = pdb.PDBMolecule('{}/pdb/UMP.pdb'.format(SETTINGS.AppLocation), offset=[-100, 0, 0])
+
+    nucleotides = [pdb_guanine, pdb_adenine, pdb_cytosine, pdb_uracil]
+
+    return random.choice(nucleotides)
+
+
+random1 = random.randint(-60, -30)
+random2 = random.randint(-20, 20)
+random3 = random.randint(-30, 5)
+random_mol = create_random_nucl()
 
 def create_first_part(step_in_frame, two_fifth_of_animation):
     """ """
@@ -41,8 +58,13 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
     URACIL_ONE.rotate([0, 0, 1], [0, 0, -pi])
     ADENINE.rotate([1, 0, 0], [pi + pi / 3, 0, 0])
 
+
+    # print(random1, random2, random3)
+
     if step_in_frame in range(0, one_sixth_of_scene):
         uracil_x_location = step_in_frame * distance_per_frame - start
+        random_x_location = step_in_frame * random.randrange(0, 3) - start
+        random_mol.move_to([random_x_location, 15, -10])
         URACIL_ONE.move_to([uracil_x_location, -20, 0])
 
     if step_in_frame in range(one_sixth_of_scene, two_sixth_of_scene):
@@ -97,7 +119,7 @@ def frame(step):
 
     if step in range(0, two_fifth_of_animation):
         create_first_part(step_in_frame, two_fifth_of_animation)
-        # ADENINE.move_to([-10, 0, 0])
+
 
 
 
@@ -113,13 +135,13 @@ def frame(step):
     # Return the Scene object for rendering
     return Scene(Camera('location', [0, 8, -50], 'look_at', [0, 2, -5]),
                  objects=[models.default_light] + URACIL_ONE.povray_molecule + ADENINE.povray_molecule
-                 + URACIL_TWO.povray_molecule + GUANINE.povray_molecule + CYTOSINE.povray_molecule)
+                 + URACIL_TWO.povray_molecule + GUANINE.povray_molecule + CYTOSINE.povray_molecule + random_mol.povray_molecule)
 
 
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(39, 40))
+    pypovray.render_scene_to_mp4(frame, range(10, 30))
     return 0
 
 
