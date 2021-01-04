@@ -27,14 +27,15 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
 
     ADENINE.rotate([1, 0, 0], pi + pi / 3)
     ADENINE_TWO.rotate([1, 0, 0], pi + pi / 3)
-    GUANINE.rotate([0, 1, 1], [0, pi / 2 + pi / 3, pi / 2])
+    GUANINE.rotate([0, 1, 1], [0, pi / 2 + pi / 3, 0])
+    CYTOSINE.rotate([1, 1, 1], [pi/4, pi, pi])
 
 
     URACIL_ONE.move_to([-5, -20, 0])
     ADENINE.move_to([0, -10, 0])
     ADENINE_TWO.move_to([-4.5, -6, 5])
     GUANINE.move_to([-10, 4, 10])
-    CYTOSINE.move_to([-15, 20, 0])
+    CYTOSINE.move_to([-15, 15, 0])
 
 
 def frame(step):
