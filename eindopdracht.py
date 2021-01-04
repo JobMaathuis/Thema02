@@ -40,10 +40,10 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
     distance_per_frame = distance / one_sixth_of_scene
 
 
-    URACIL_ONE.rotate([1, 1, 0], [pi / 3, pi, 0] )
+
     ADENINE.rotate([1, 0, 0], pi + pi / 3)
     ADENINE_TWO.rotate([1, 0, 0], pi + pi / 3)
-
+    GUANINE.rotate([0, 1, 0], [0, pi, pi])
 
     if step_in_frame in range(0, one_sixth_of_scene):
         uracil_x_location = step_in_frame * distance_per_frame - start
@@ -75,8 +75,8 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
         cytosine_x_location = step_in_scene * distance_per_frame - start
         URACIL_ONE.move_to([end, -20, 0])
         ADENINE.move_to([end, -10, 0])
-        ADENINE_TWO.move_to([-5, -5, 0])
-        GUANINE.move_to([end, 10, 0])
+        ADENINE_TWO.move_to([-5, -5, 5])
+        GUANINE.move_to([-10, 0, 10])
         CYTOSINE.move_to([cytosine_x_location, 20, 0])
 
 
@@ -115,7 +115,7 @@ def frame(step):
     # if step in range(n_frames // 5 * 4, n_frames):
 
     # Return the Scene object for rendering
-    return Scene(Camera('location', [0, 0, -40], 'look_at', [0, 0, 0]),
+    return Scene(Camera('location', [0, 0, -50], 'look_at', [0, 0, 0]),
                  objects=[models.default_light] + URACIL_ONE.povray_molecule + ADENINE.povray_molecule
                  + ADENINE_TWO.povray_molecule + GUANINE.povray_molecule + CYTOSINE.povray_molecule)
 
