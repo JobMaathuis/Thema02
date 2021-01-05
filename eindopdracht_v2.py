@@ -12,7 +12,7 @@ from math import pi
 from pypovray import pypovray, SETTINGS, models, pdb, logger
 from vapory import Scene, Camera
 
-NUCL_1 = NUCL_2 = NUCL_3 = NUCL_4 = NUCL_5 = NUCL_6 = NUCL_7 = None
+# NUCL_1 = NUCL_2 = NUCL_3 = NUCL_4 = NUCL_5 = NUCL_6 = NUCL_7 = None
 
 
 def create_molecules():
@@ -43,20 +43,48 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
     four_sixth_of_scene = one_sixth_of_scene * 4
     five_sixth_of_scene = one_sixth_of_scene * 5
 
-    distance = 50
+    distance = 100
     distance_per_frame = distance / one_sixth_of_scene
 
     if step_in_frame in range(0, one_sixth_of_scene):
-        x_offset = step_in_frame * distance_per_frame - distance
+        x_offset = step_in_frame * distance_per_frame - distance / 2
         print(x_offset)
         NUCL_1.move_offset([x_offset, 0, 0])
 
     if step_in_frame in range(one_sixth_of_scene, two_sixth_of_scene):
         step_in_scene = step_in_frame - one_sixth_of_scene
-        x_offset = step_in_scene * distance_per_frame - distance
-        NUCL_1.move_offset([distance, 0, 0])
+        x_offset = step_in_scene * distance_per_frame - distance / 2
+        NUCL_1.move_offset([50, 0, 0])
         NUCL_2.move_offset([x_offset, 0, 0])
+        NUCL_3.move_offset([x_offset, 0, 0])
 
+    if step_in_frame in range(two_sixth_of_scene, three_sixth_of_scene):
+        step_in_scene = step_in_frame - two_sixth_of_scene
+        x_offset = step_in_scene * distance_per_frame - distance / 2
+        NUCL_1.move_offset([50, 0, 0])
+        NUCL_2.move_offset([50, 0, 0])
+        NUCL_3.move_offset([50, 0, 0])
+        NUCL_4.move_offset([x_offset, 0, 0])
+
+    if step_in_frame in range(three_sixth_of_scene, four_sixth_of_scene):
+        step_in_scene = step_in_frame - three_sixth_of_scene
+        x_offset = step_in_scene * distance_per_frame - distance / 2
+        NUCL_1.move_offset([50, 0, 0])
+        NUCL_2.move_offset([50, 0, 0])
+        NUCL_3.move_offset([50, 0, 0])
+        NUCL_4.move_offset([50, 0, 0])
+        NUCL_5.move_offset([x_offset, 0, 0])
+
+    if step_in_frame in range(four_sixth_of_scene, five_sixth_of_scene):
+        step_in_scene = step_in_frame - four_sixth_of_scene
+        x_offset = step_in_scene * distance_per_frame - distance / 2
+        NUCL_1.move_offset([50, 0, 0])
+        NUCL_2.move_offset([50, 0, 0])
+        NUCL_3.move_offset([50, 0, 0])
+        NUCL_4.move_offset([50, 0, 0])
+        NUCL_5.move_offset([50, 0, 0])
+        NUCL_6.move_offset([x_offset, 0, 0])
+        NUCL_7.move_offset([x_offset, 0, 0])
 
 
 def frame(step):
@@ -91,16 +119,16 @@ def frame(step):
     # if step in range(n_frames // 5 * 4, n_frames):
 
     # Return the Scene object for rendering
-    return Scene(Camera('location', [0, 0, -50], 'look_at', [0, 0, 0]),
+    return Scene(Camera('location', [0, 0, -100], 'look_at', [0, 0, 0]),
                  objects=[models.default_light] + NUCL_1.povray_molecule + NUCL_2.povray_molecule +
                  NUCL_3.povray_molecule + NUCL_4.povray_molecule + NUCL_5.povray_molecule +
-                NUCL_6.povray_molecule + NUCL_7.povray_molecule)
+                         NUCL_6.povray_molecule + NUCL_7.povray_molecule)
 
 
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(0, 10))
+    pypovray.render_scene_to_mp4(frame, range(0, 145))
     return 0
 
 
