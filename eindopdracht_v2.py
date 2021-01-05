@@ -26,13 +26,13 @@ def create_molecules():
     nucleotide_atoms = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
                         21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
 
-    NUCL_1 = RNA.divide(nucleotide_atoms, 'nucleotide_1')
-    NUCL_2 = RNA.divide(nucleotide_atoms, 'nucleotide_2')
-    NUCL_3 = RNA.divide(nucleotide_atoms, 'nucleotide_3')
-    NUCL_4 = RNA.divide(nucleotide_atoms, 'nucleotide_4')
-    NUCL_5 = RNA.divide(nucleotide_atoms, 'nucleotide_5')
-    NUCL_6 = RNA.divide(nucleotide_atoms, 'nucleotide_6')
-    NUCL_7 = RNA.divide(nucleotide_atoms, 'nucleotide_7')
+    NUCL_1 = rna.divide(nucleotide_atoms, 'nucleotide_1', offset=[-50, 0, 0])
+    NUCL_2 = rna.divide(nucleotide_atoms, 'nucleotide_2', offset=[-50, 0, 0])
+    NUCL_3 = rna.divide(nucleotide_atoms, 'nucleotide_3', offset=[-50, 0, 0])
+    NUCL_4 = rna.divide(nucleotide_atoms, 'nucleotide_4', offset=[-50, 0, 0])
+    NUCL_5 = rna.divide(nucleotide_atoms, 'nucleotide_5', offset=[-50, 0, 0])
+    NUCL_6 = rna.divide(nucleotide_atoms, 'nucleotide_6', offset=[-50, 0, 0])
+    NUCL_7 = rna.divide(nucleotide_atoms, 'nucleotide_7', offset=[-50, 0, 0])
 
 
 def create_first_part(step_in_frame, two_fifth_of_animation):
@@ -43,26 +43,19 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
     four_sixth_of_scene = one_sixth_of_scene * 4
     five_sixth_of_scene = one_sixth_of_scene * 5
 
-    start = 30
-    end = 0
-
-    distance = start - end
+    distance = 50
     distance_per_frame = distance / one_sixth_of_scene
 
     if step_in_frame in range(0, one_sixth_of_scene):
-
+        x_offset = step_in_frame * distance_per_frame - distance
+        print(x_offset)
+        NUCL_1.move_offset([x_offset, 0, 0])
 
     if step_in_frame in range(one_sixth_of_scene, two_sixth_of_scene):
-
-
-    if step_in_frame in range(two_sixth_of_scene, three_sixth_of_scene):
-
-
-    if step_in_frame in range(three_sixth_of_scene, four_sixth_of_scene):
-
-
-    if step_in_frame in range(four_sixth_of_scene, five_sixth_of_scene):
-
+        step_in_scene = step_in_frame - one_sixth_of_scene
+        x_offset = step_in_scene * distance_per_frame - distance
+        NUCL_1.move_offset([distance, 0, 0])
+        NUCL_2.move_offset([x_offset, 0, 0])
 
 
 
@@ -107,7 +100,7 @@ def frame(step):
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(39, 40))
+    pypovray.render_scene_to_mp4(frame, range(0, 10))
     return 0
 
 
