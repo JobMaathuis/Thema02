@@ -8,9 +8,9 @@ __author__ = 'Joukje Kloosterman, Job Maathuis'
 
 import sys
 from assignment2a import legend
-from math import pi
+from math import pi, sin, cos
 from pypovray import pypovray, SETTINGS, models, pdb, logger
-from vapory import Scene, Camera
+from vapory import Scene, Camera, Sphere, Texture, Pigment, Finish
 
 # NUCL_1 = NUCL_2 = NUCL_3 = NUCL_4 = NUCL_5 = NUCL_6 = NUCL_7 = None
 
@@ -48,7 +48,6 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
 
     if step_in_frame in range(0, one_sixth_of_scene):
         x_offset = step_in_frame * distance_per_frame - distance / 2
-        print(x_offset)
         NUCL_1.move_offset([x_offset, 0, 0])
 
     if step_in_frame in range(one_sixth_of_scene, two_sixth_of_scene):
@@ -101,17 +100,43 @@ def frame(step):
     # obtain molecules from function
     create_molecules()
 
-    # Creation of RNA molecule
     step_in_frame = step
     two_fifth_of_animation = n_frames // 5 * 2
+    three_fifth_of_animation = n_frames // 5 * 3
 
+    VESICLE = Sphere([100, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                                              Finish('phong', 0.4, 'reflection', 0.2)))
+
+    # Creation of RNA molecule
     if step in range(0, two_fifth_of_animation):
-        create_first_part(step_in_frame, two_fifth_of_animation)
+        create_first_part(step_in_frame, two_fifth_of_animation + 1)
 
+    # Sphere covering the RNA molecule
+    if step in range(two_fifth_of_animation, three_fifth_of_animation):
+        NUCL_1.move_offset([50, 0, 0])
+        NUCL_2.move_offset([50, 0, 0])
+        NUCL_3.move_offset([50, 0, 0])
+        NUCL_4.move_offset([50, 0, 0])
+        NUCL_5.move_offset([50, 0, 0])
+        NUCL_6.move_offset([50, 0, 0])
+        NUCL_7.move_offset([50, 0, 0])
 
-    # # Sphere covering the RNA molecule
-    # if step in range(n_frames // 5 * 2, n_frames // 5 * 3):
-    #
+        step_in_frame = step - two_fifth_of_animation
+        x_start = 100
+        x_end = -50
+
+        distance_x = x_end - x_start
+
+        distance_per_frame_x = (distance_x / three_fifth_of_animation) * 2
+
+        x_coord = x_start + step_in_frame * distance_per_frame_x
+        y_coord = 2 * sin(x_coord/5)
+        print(y_coord)
+
+        VESICLE = Sphere([x_coord, y_coord, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                                                            Finish('phong', 0.4, 'reflection', 0.2)))
+        # create_second_part(step_in_frame, three_fifth_of_animation)
+
     # # RNA division
     # if step in range(n_frames // 5 * 3, n_frames // 5 * 4):
     #
@@ -120,7 +145,7 @@ def frame(step):
 
     # Return the Scene object for rendering
     return Scene(Camera('location', [0, 0, -100], 'look_at', [0, 0, 0]),
-                 objects=[models.default_light] + NUCL_1.povray_molecule + NUCL_2.povray_molecule +
+                 objects=[models.default_light, VESICLE] + NUCL_1.povray_molecule + NUCL_2.povray_molecule +
                  NUCL_3.povray_molecule + NUCL_4.povray_molecule + NUCL_5.povray_molecule +
                          NUCL_6.povray_molecule + NUCL_7.povray_molecule)
 
@@ -128,7 +153,7 @@ def frame(step):
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(0, 145))
+    pypovray.render_scene_to_mp4(frame, range(100, 216))
     return 0
 
 
