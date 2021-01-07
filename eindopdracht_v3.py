@@ -7,6 +7,7 @@
 __author__ = 'Joukje Kloosterman, Job Maathuis'
 
 import sys
+import random
 from assignment2a import legend
 from math import pi, sin, cos
 from pypovray import pypovray, SETTINGS, models, pdb, logger
@@ -116,19 +117,49 @@ def create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_ani
     NUCL_5.move_offset([50, 0, 0])
     NUCL_6.move_offset([50, 0, 0])
     NUCL_7.move_offset([50, 0, 0])
-    vesicle = Sphere([0, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                            Finish('phong', 0.4, 'reflection', 0.2)))
 
-    step_in_scene = step_in_frame - (three_fifth_of_animation + 1)
+    total_frames = four_fifth_of_animation - three_fifth_of_animation
+    step_in_scene = step_in_frame - three_fifth_of_animation
+
+    end_coord = 20
+    start_coord = 100
+    distance = start_coord - end_coord
+    distance_per_frame = distance / (total_frames // 4)
+    coord =
     z_start = -100
     z_end = -150
+    z_coord = -150
+    radius = 20
 
-    distance_z = z_end - z_start
-    distance_per_frame_z = (distance_z / four_fifth_of_animation) * 2
+    if step_in_scene in range(0, total_frames // 4):
+        distance_z = z_end - z_start
+        distance_per_frame_z = distance_z / (total_frames // 4)
+        z_coord = z_start + step_in_scene * distance_per_frame_z
 
-    z_coord = z_start + step_in_scene * distance_per_frame_z
+    if step_in_scene in range(total_frames // 4, total_frames // 4 * 2):
+        
+        small_vesicle_1 = Sphere([-20, 0, 0], random.randint(1, 6), Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                            Finish('phong', 0.4, 'reflection', 0.2)))
+        small_vesicle_2 = Sphere([20, 0, 0], random.randint(1, 6),
+                                 Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                                         Finish('phong', 0.4, 'reflection', 0.2)))
 
-    return vesicle, z_coord
+    # if step_in_scene in range(total_frames // 4 * 2, total_frames // 4 * 3):
+    #
+    # if step_in_scene in range(total_frames // 4 * 3, total_frames):
+        # small_vesicle_3 = Sphere([0, 0, 0], random.randint(1, 6),
+        #                  Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
+        # small_vesicle_4 = Sphere([0, 0, 0], random.randint(1, 6),
+        #                  Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
+        # small_vesicle_5 = Sphere([0, 0, 0], random.randint(1, 6),
+        #                  Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
+        # small_vesicle_6 = Sphere([0, 0, 0], random.randint(1, 6),
+        #                  Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
+
+    vesicle = Sphere([0, 0, 0], radius, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                                            Finish('phong', 0.4, 'reflection', 0.2)))
+
+    return vesicle, z_coord, small_vesicle_1, small_vesicle_2
 
 
 def frame(step):
@@ -158,19 +189,19 @@ def frame(step):
         create_first_part(step_in_frame, two_fifth_of_animation)
 
     # Sphere covering the RNA molecule
-    if step in range(two_fifth_of_animation, three_fifth_of_animation + 1):
+    if step in range(two_fifth_of_animation, three_fifth_of_animation):
         vesicle = create_second_part(step_in_frame, two_fifth_of_animation, three_fifth_of_animation)
 
     # Vesicle growth
-    if step in range(three_fifth_of_animation, four_fifth_of_animation + 1):
-        vesicle, camera_z = create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_animation)
+    if step in range(three_fifth_of_animation, four_fifth_of_animation):
+        vesicle, camera_z, small_vesicle_1, small_vesicle_2 = create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_animation)
 
     # # Sphere division
     # if step in range(n_frames // 5 * 4, n_frames):
 
     # Return the Scene object for rendering
     return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
-                 objects=[models.default_light, vesicle] + NUCL_1.povray_molecule + NUCL_2.povray_molecule +
+                 objects=[models.default_light, vesicle, small_vesicle_1, small_vesicle_2] + NUCL_1.povray_molecule + NUCL_2.povray_molecule +
                  NUCL_3.povray_molecule + NUCL_4.povray_molecule + NUCL_5.povray_molecule +
                          NUCL_6.povray_molecule + NUCL_7.povray_molecule)
 
@@ -178,7 +209,7 @@ def frame(step):
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(70, 85))
+    pypovray.render_scene_to_mp4(frame, range(79, 81))
     return 0
 
 
