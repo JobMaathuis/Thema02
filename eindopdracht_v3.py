@@ -8,7 +8,6 @@ __author__ = 'Joukje Kloosterman, Job Maathuis'
 
 import sys
 import random
-from assignment2a import legend
 from math import pi, sin, cos
 from pypovray import pypovray, SETTINGS, models, pdb, logger
 from vapory import Scene, Camera, Sphere, Texture, Pigment, Finish
@@ -125,7 +124,7 @@ def create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_ani
     start_coord = 100
     distance = start_coord - end_coord
     distance_per_frame = distance / (total_frames // 4)
-    coord =
+    # coord =
     z_start = -100
     z_end = -150
     z_coord = -150
@@ -137,10 +136,11 @@ def create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_ani
         z_coord = z_start + step_in_scene * distance_per_frame_z
 
     if step_in_scene in range(total_frames // 4, total_frames // 4 * 2):
-        
-        small_vesicle_1 = Sphere([-20, 0, 0], random.randint(1, 6), Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+        part_in_scene = step_in_scene - (total_frames // 4 * 2)
+        x_coord = distance_per_frame * part_in_scene
+        small_vesicle_1 = Sphere([-x_coord, 0, 0], random.randint(1, 6), Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                             Finish('phong', 0.4, 'reflection', 0.2)))
-        small_vesicle_2 = Sphere([20, 0, 0], random.randint(1, 6),
+        small_vesicle_2 = Sphere([x_coord, 0, 0], random.randint(1, 6),
                                  Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                                          Finish('phong', 0.4, 'reflection', 0.2)))
 
