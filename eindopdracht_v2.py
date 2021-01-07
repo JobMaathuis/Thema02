@@ -17,22 +17,22 @@ from vapory import Scene, Camera, Sphere, Texture, Pigment, Finish
 
 def create_molecules():
     """ Creates the molecules """
-    global NUCL_1, NUCL_2, NUCL_3, NUCL_4, NUCL_5, NUCL_6, NUCL_7
+    global NUCL_1, NUCL_2, NUCL_3, NUCL_4, NUCL_5, NUCL_6, NUCL_7, RNA
 
-    rna = pdb.PDBMolecule('{}/pdb/RNA2.pdb'.format(SETTINGS.AppLocation), offset=[-100, 0, 0])
+    RNA = pdb.PDBMolecule('{}/pdb/RNA2.pdb'.format(SETTINGS.AppLocation)) #, offset=[-100, 0, 0])
     # RNA.show_label(camera=models.default_camera, name=True)
-    rna.rotate([0, 1, 1], [0, 3.14, 3.14])
+    RNA.rotate([0, 1, 1], [0, pi, pi])
 
     nucleotide_atoms = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
                         21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
 
-    NUCL_1 = rna.divide(nucleotide_atoms, 'nucleotide_1', offset=[-50, 0, 0])
-    NUCL_2 = rna.divide(nucleotide_atoms, 'nucleotide_2', offset=[-50, 0, 0])
-    NUCL_3 = rna.divide(nucleotide_atoms, 'nucleotide_3', offset=[-50, 0, 0])
-    NUCL_4 = rna.divide(nucleotide_atoms, 'nucleotide_4', offset=[-50, 0, 0])
-    NUCL_5 = rna.divide(nucleotide_atoms, 'nucleotide_5', offset=[-50, 0, 0])
-    NUCL_6 = rna.divide(nucleotide_atoms, 'nucleotide_6', offset=[-50, 0, 0])
-    NUCL_7 = rna.divide(nucleotide_atoms, 'nucleotide_7', offset=[-50, 0, 0])
+    NUCL_1 = RNA.divide(nucleotide_atoms, 'nucleotide_1', offset=[-50, 0, 0])
+    NUCL_2 = RNA.divide(nucleotide_atoms, 'nucleotide_2', offset=[-50, 0, 0])
+    NUCL_3 = RNA.divide(nucleotide_atoms, 'nucleotide_3', offset=[-50, 0, 0])
+    NUCL_4 = RNA.divide(nucleotide_atoms, 'nucleotide_4', offset=[-50, 0, 0])
+    NUCL_5 = RNA.divide(nucleotide_atoms, 'nucleotide_5', offset=[-50, 0, 0])
+    NUCL_6 = RNA.divide(nucleotide_atoms, 'nucleotide_6', offset=[-50, 0, 0])
+    NUCL_7 = RNA.divide(nucleotide_atoms, 'nucleotide_7', offset=[-50, 0, 0])
 
 
 def create_first_part(step_in_frame, two_fifth_of_animation):
@@ -107,12 +107,13 @@ def frame(step):
     VESICLE = Sphere([100, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                                               Finish('phong', 0.4, 'reflection', 0.2)))
 
+    camera_z = -100
     # Creation of RNA molecule
     if step in range(0, two_fifth_of_animation):
         create_first_part(step_in_frame, two_fifth_of_animation + 1)
 
     # Sphere covering the RNA molecule
-    if step in range(two_fifth_of_animation, three_fifth_of_animation):
+    if step in range(two_fifth_of_animation, three_fifth_of_animation + 1):
         NUCL_1.move_offset([50, 0, 0])
         NUCL_2.move_offset([50, 0, 0])
         NUCL_3.move_offset([50, 0, 0])
@@ -126,7 +127,6 @@ def frame(step):
         x_end = -50
 
         distance_x = x_end - x_start
-
         distance_per_frame_x = (distance_x / three_fifth_of_animation) * 2
 
         x_coord = x_start + step_in_frame * distance_per_frame_x
@@ -135,16 +135,26 @@ def frame(step):
 
         VESICLE = Sphere([x_coord, y_coord, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                                                             Finish('phong', 0.4, 'reflection', 0.2)))
-        # create_second_part(step_in_frame, three_fifth_of_animation)
 
-    # # RNA division
-    # if step in range(n_frames // 5 * 3, n_frames // 5 * 4):
-    #
+
+    # Vesicle growth
+    if step in range(n_frames // 5 * 3, n_frames // 5 * 4 + 1):
+        NUCL_1.move_offset([50, 0, 0])
+        NUCL_2.move_offset([50, 0, 0])
+        NUCL_3.move_offset([50, 0, 0])
+        NUCL_4.move_offset([50, 0, 0])
+        NUCL_5.move_offset([50, 0, 0])
+        NUCL_6.move_offset([50, 0, 0])
+        NUCL_7.move_offset([50, 0, 0])
+        VESICLE = Sphere([0, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                                                            Finish('phong', 0.4, 'reflection', 0.2)))
+        # camere movement
+        if step in range(n_frames // 5, n_frames // 4.3) camera_z = -150
     # # Sphere division
     # if step in range(n_frames // 5 * 4, n_frames):
 
     # Return the Scene object for rendering
-    return Scene(Camera('location', [0, 0, -100], 'look_at', [0, 0, 0]),
+    return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
                  objects=[models.default_light, VESICLE] + NUCL_1.povray_molecule + NUCL_2.povray_molecule +
                  NUCL_3.povray_molecule + NUCL_4.povray_molecule + NUCL_5.povray_molecule +
                          NUCL_6.povray_molecule + NUCL_7.povray_molecule)
@@ -153,7 +163,7 @@ def frame(step):
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(100, 216))
+    pypovray.render_scene_to_mp4(frame, range(74, 75))
     return 0
 
 
