@@ -137,7 +137,7 @@ def create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_ani
         z_coord = z_start + step_in_scene * distance_per_frame_z
 
     if step_in_scene in range(total_frames // 4, total_frames // 4 * 2):
-        
+
         small_vesicle_1 = Sphere([-20, 0, 0], random.randint(1, 6), Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                             Finish('phong', 0.4, 'reflection', 0.2)))
         small_vesicle_2 = Sphere([20, 0, 0], random.randint(1, 6),
