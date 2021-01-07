@@ -86,6 +86,11 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
         NUCL_7.move_offset([x_offset, 0, 0])
 
 
+def create_second_part(step_in_frame, three_fifth_of_animation):
+
+
+
+
 def frame(step):
     """ """
     # Feedback to user in terminal about render status
@@ -149,7 +154,11 @@ def frame(step):
         VESICLE = Sphere([0, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                                                             Finish('phong', 0.4, 'reflection', 0.2)))
         # camere movement
-        if step in range(n_frames // 5, n_frames // 4.3) camera_z = -150
+        if step in range(n_frames // 5 * 3, n_frames // 5 * 4 // 2):
+            camera_z_start = -100
+            camera_z_end = -150
+            distance_camera_z = camera_z_end - camera_z_start
+            z_camera_coord = step_in_frame * distance_per_frame - camera_z_start
     # # Sphere division
     # if step in range(n_frames // 5 * 4, n_frames):
 

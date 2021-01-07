@@ -37,7 +37,7 @@ def create_molecules():
 
 def create_first_part(step_in_frame, two_fifth_of_animation):
     """ """
-    part_in_scene = [two_fifth_of_animation // 5 * part_of_scene for part_of_scene in range(1,6)]
+    part_in_scene = [two_fifth_of_animation // 5 * part_of_scene for part_of_scene in range(1, 6)]
 
     distance = 100
     distance_per_frame = distance / part_in_scene[0]
@@ -82,7 +82,7 @@ def create_first_part(step_in_frame, two_fifth_of_animation):
         NUCL_7.move_offset([x_offset, 0, 0])
 
 
-def create_second_part(step_in_frame, two_fifth_of_animation):
+def create_second_part(step_in_frame, two_fifth_of_animation, three_fifth_of_animation):
     NUCL_1.move_offset([50, 0, 0])
     NUCL_2.move_offset([50, 0, 0])
     NUCL_3.move_offset([50, 0, 0])
@@ -91,20 +91,45 @@ def create_second_part(step_in_frame, two_fifth_of_animation):
     NUCL_6.move_offset([50, 0, 0])
     NUCL_7.move_offset([50, 0, 0])
 
-    step_in_frame = step - two_fifth_of_animation
+    step_in_scene = step_in_frame - (two_fifth_of_animation + 1)
     x_start = 100
     x_end = -50
 
     distance_x = x_end - x_start
     distance_per_frame_x = (distance_x / three_fifth_of_animation) * 2
 
-    x_coord = x_start + step_in_frame * distance_per_frame_x
+    x_coord = x_start + step_in_scene * distance_per_frame_x
     y_coord = 2 * sin(x_coord / 5)
-    print(y_coord)
+
 
     vesicle = Sphere([x_coord, y_coord, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                                                         Finish('phong', 0.4, 'reflection', 0.2)))
+
     return vesicle
+
+
+def create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_animation):
+    NUCL_1.move_offset([50, 0, 0])
+    NUCL_2.move_offset([50, 0, 0])
+    NUCL_3.move_offset([50, 0, 0])
+    NUCL_4.move_offset([50, 0, 0])
+    NUCL_5.move_offset([50, 0, 0])
+    NUCL_6.move_offset([50, 0, 0])
+    NUCL_7.move_offset([50, 0, 0])
+    vesicle = Sphere([0, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                                            Finish('phong', 0.4, 'reflection', 0.2)))
+
+    step_in_scene = step_in_frame - (three_fifth_of_animation + 1)
+    z_start = -100
+    z_end = -150
+
+    distance_z = z_end - z_start
+    distance_per_frame_z = (distance_z / four_fifth_of_animation) * 2
+
+    z_coord = z_start + step_in_scene * distance_per_frame_z
+
+    return vesicle, z_coord
+
 
 def frame(step):
     """ """
@@ -122,10 +147,10 @@ def frame(step):
     one_fifth_of_animation = n_frames // 5
     two_fifth_of_animation = n_frames // 5 * 2
     three_fifth_of_animation = n_frames // 5 * 3
-
-
+    four_fifth_of_animation = n_frames // 5 * 4
 
     camera_z = -100
+
     # Creation of RNA molecule
     if step in range(0, two_fifth_of_animation + 1):
         vesicle = Sphere([100, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
@@ -134,22 +159,12 @@ def frame(step):
 
     # Sphere covering the RNA molecule
     if step in range(two_fifth_of_animation, three_fifth_of_animation + 1):
-        vesicle = create_second_part()
-
+        vesicle = create_second_part(step_in_frame, two_fifth_of_animation, three_fifth_of_animation)
 
     # Vesicle growth
-    if step in range(n_frames // 5 * 3, n_frames // 5 * 4 + 1):
-        NUCL_1.move_offset([50, 0, 0])
-        NUCL_2.move_offset([50, 0, 0])
-        NUCL_3.move_offset([50, 0, 0])
-        NUCL_4.move_offset([50, 0, 0])
-        NUCL_5.move_offset([50, 0, 0])
-        NUCL_6.move_offset([50, 0, 0])
-        NUCL_7.move_offset([50, 0, 0])
-        vesicle = Sphere([0, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                            Finish('phong', 0.4, 'reflection', 0.2)))
-        # camere movement
-        # if step in range(n_frames // 5, n_frames // 4.3) camera_z = -150
+    if step in range(three_fifth_of_animation, four_fifth_of_animation + 1):
+        vesicle, camera_z = create_third_part(step_in_frame, three_fifth_of_animation, four_fifth_of_animation)
+
     # # Sphere division
     # if step in range(n_frames // 5 * 4, n_frames):
 
@@ -163,7 +178,7 @@ def frame(step):
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame, range(0, 75))
+    pypovray.render_scene_to_mp4(frame, range(70, 85))
     return 0
 
 
