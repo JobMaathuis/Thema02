@@ -141,7 +141,7 @@ def create_second_part_of_animation(frame_number, thirty_percent_of_total_frames
     return vesicle
 
 
-def create_third_part_of_the_animation(frame_number, fifty_percent_of_total_frames, eighty_percent_of_total_frames):
+def create_third_part_of_the_animation(frame_number, starting_frame, ending_frame):
     """
     In this function a RNA moleucle is placed in the center of the scene.
     The vesicle (a Sphere object) is placed over the molecule.
@@ -163,10 +163,10 @@ def create_third_part_of_the_animation(frame_number, fifty_percent_of_total_fram
                                                      Finish('phong', 0.4, 'reflection', 0.2)))
 
     # Determine total frames of second part
-    total_frames_of_third_part = eighty_percent_of_total_frames - fifty_percent_of_total_frames
+    total_frames_of_third_part =  ending_frame - starting_frame
 
     # Determine in which step of the second part we are, starting with zero
-    step_in_part = frame_number - (fifty_percent_of_total_frames + 1)
+    step_in_part = frame_number - (starting_frame + 1)
 
     # Dividing the frames of this part into fifths
     one_fifth_of_part = total_frames_of_third_part // 5
@@ -175,7 +175,7 @@ def create_third_part_of_the_animation(frame_number, fifty_percent_of_total_fram
     four_fifth_of_part = total_frames_of_third_part // 5 * 4
 
     # Default variables: z coordinates for camera and radius for vesicle
-    z_coord_camera = -150
+    z_coord_camera = -100
     radius_vesicle = 20
 
     # Start and end coordinates for zooming out with camera
@@ -190,14 +190,6 @@ def create_third_part_of_the_animation(frame_number, fifty_percent_of_total_fram
     radius_increase = 10
     radius_increase_per_frame = radius_increase / (total_frames_of_third_part // 5)
 
-    # Start and end coordinates for smaller vesicles
-    end_coord = 20
-    start_coord = 120
-
-    # Calculating distance per frame to cover for smaller vesicles
-    distance = start_coord - end_coord
-    distance_per_frame = distance / one_fifth_of_part
-
     # In first segment of this part the camera is zooming out
     if step_in_part in range(0, one_fifth_of_part):
         z_coord_camera = z_start_camera + step_in_part * distance_per_frame_z
@@ -205,20 +197,30 @@ def create_third_part_of_the_animation(frame_number, fifty_percent_of_total_fram
     # In the second segment two small vesicles move towards the big vesicle
     elif step_in_part in range(one_fifth_of_part, two_fifth_of_part):
         step_in_segment = step_in_part - one_fifth_of_part
+        end_coord = 20
+        start_coord = 120
+        distance = start_coord - end_coord
+        distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
         small_vesicle_1 = Sphere([-x_coord, sin(x_coord/3), 0], 3, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                             Finish('phong', 0.4, 'reflection', 0.2)))
         small_vesicle_2 = Sphere([x_coord, cos(x_coord/3), 0], 5, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
                             Finish('phong', 0.4, 'reflection', 0.2)))
+        z_coord_camera = -150
 
     # In the third segment the radius of the big vesicle is increased
     elif step_in_part in range(two_fifth_of_part, three_fifth_of_part):
         step_in_segment = step_in_part - two_fifth_of_part
         radius_vesicle += radius_increase_per_frame * step_in_segment
+        z_coord_camera = -150
 
     # In the fourth segment three small vesicles move towards the bigger vesicle
     elif step_in_part in range(three_fifth_of_part, four_fifth_of_part):
         step_in_segment = step_in_part - three_fifth_of_part
+        end_coord = 30
+        start_coord = 120
+        distance = start_coord - end_coord
+        distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
         radius_vesicle = 30
         small_vesicle_3 = Sphere([x_coord, sin(x_coord/3), 0], 2,
@@ -227,12 +229,14 @@ def create_third_part_of_the_animation(frame_number, fifty_percent_of_total_fram
                          Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
         small_vesicle_5 = Sphere([sin(x_coord/3), -x_coord, 0], 5,
                          Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
+        z_coord_camera = -150
 
     # In the last segment the radius of the bigger vesicle is increased
     elif step_in_part in range(four_fifth_of_part, total_frames_of_third_part):
         radius_vesicle = 30
         part_in_scene = step_in_part - four_fifth_of_part
         radius_vesicle += radius_increase_per_frame * part_in_scene
+        z_coord_camera = -150
 
     # Making the big vesicle (as a Sphere object) with its newly given radius
     vesicle = Sphere([0, 0, 0], radius_vesicle, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
@@ -241,7 +245,7 @@ def create_third_part_of_the_animation(frame_number, fifty_percent_of_total_fram
     return vesicle, z_coord_camera, small_vesicle_1, small_vesicle_2, small_vesicle_3, small_vesicle_4, small_vesicle_5
 
 
-def create_fourth_part_of_the_animation(frame_number, eighty_percent_of_animation, total_frames):
+def create_fourth_part_of_the_animation(frame_number, starting_frame, ending_frame):
     """
     In this function a RNA-molecule is replicated, then the vesicle (as a Sphere object) is
     separated into two smaller vesicles, each vesicle containing a RNA-molecule.
@@ -257,10 +261,10 @@ def create_fourth_part_of_the_animation(frame_number, eighty_percent_of_animatio
                                             Finish('phong', 0.4, 'reflection', 0.2)))
 
     # Determining the total frames of the fourth part
-    total_frames_of_fourth_part = total_frames - eighty_percent_of_animation
+    total_frames_of_fourth_part = ending_frame - starting_frame
 
     # Determine in which step of the second part we are, starting with zero
-    step_in_part = frame_number - (eighty_percent_of_animation + 1)
+    step_in_part = frame_number - (starting_frame + 1)
 
     # Dividing the frames of this part into fifths that are necessary
     one_fifth_of_part = total_frames_of_fourth_part // 5
@@ -388,7 +392,7 @@ def frame(step):
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame)
+    pypovray.render_scene_to_mp4(frame,range(295, 480))
     return 0
 
 
