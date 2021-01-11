@@ -11,21 +11,22 @@ from math import pi, sin, cos
 from pypovray import pypovray, SETTINGS, models, pdb, logger
 from vapory import Scene, Camera, Sphere, Texture, Pigment, Finish
 
+VESICLE_TEXTURE = Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2))
 
 def create_molecules():
     """ Creates the molecules """
     global NUCL_1, NUCL_2, NUCL_3, NUCL_4, NUCL_5, NUCL_6, NUCL_7, RNA_2, RNA_1
 
     # Create first RNA molecule
-    RNA_1 = pdb.PDBMolecule('{}/pdb/RNA2.pdb'.format(SETTINGS.AppLocation))
+    RNA_1 = pdb.PDBMolecule('{}/pdb/RNA.pdb'.format(SETTINGS.AppLocation))
     RNA_1.rotate([0, 1, 1], [0, pi, pi])
 
     # Create second RNA molecule
-    RNA_2 = pdb.PDBMolecule('{}/pdb/RNA2.pdb'.format(SETTINGS.AppLocation))
+    RNA_2 = pdb.PDBMolecule('{}/pdb/RNA.pdb'.format(SETTINGS.AppLocation))
     RNA_2.rotate([0, 1, 1], [0, pi, pi])
 
     # Create RNA molecule for the making of nucleotides
-    rna_to_nucl = pdb.PDBMolecule('{}/pdb/RNA2.pdb'.format(SETTINGS.AppLocation))
+    rna_to_nucl = pdb.PDBMolecule('{}/pdb/RNA.pdb'.format(SETTINGS.AppLocation))
     rna_to_nucl.rotate([0, 1, 1], [0, pi, pi])
 
     # Determine which atoms make the nucelotides
@@ -70,8 +71,8 @@ def create_first_part_of_animation(frame_number, thirty_percent_of_total_frames)
 
     # In the second segment the next two nucleotides move into the scene
     elif frame_number in range(one_fifth_of_part, two_fifth_of_part):
-        step_in_segment= frame_number - one_fifth_of_part
-        x_offset =  step_in_segment * distance_per_frame
+        step_in_segment = frame_number - one_fifth_of_part
+        x_offset = step_in_segment * distance_per_frame
         NUCL_1.move_offset([end_x_offset, 0, 0])
         NUCL_2.move_offset([x_offset, 0, 0])
         NUCL_3.move_offset([x_offset, 0, 0])
@@ -135,10 +136,9 @@ def create_second_part_of_animation(frame_number, thirty_percent_of_total_frames
     y_coord = 2 * sin(x_coord / 5)
 
     # Making the vesicle with a sphere and placing it at the created x and y coordinates
-    vesicle = Sphere([x_coord, y_coord, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                        Finish('phong', 0.4, 'reflection', 0.2)))
+    vesicle = Sphere([x_coord, y_coord, 0], 20, VESICLE_TEXTURE)
 
-    return vesicle
+    return [vesicle]
 
 
 def create_third_part_of_the_animation(frame_number, starting_frame, ending_frame):
@@ -151,19 +151,14 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
     RNA_1.move_to([0, 0, 0])
 
     # Creating the smaller vesicles and place them out of the scene
-    small_vesicle_1 = Sphere([120, 0, 0], 3, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                          Finish('phong', 0.4, 'reflection', 0.2)))
-    small_vesicle_2 = Sphere([120, 0, 0], 5, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                         Finish('phong', 0.4, 'reflection', 0.2)))
-    small_vesicle_3 = Sphere([120, 0, 0], 2, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                     Finish('phong', 0.4, 'reflection', 0.2)))
-    small_vesicle_4 = Sphere([120, 0, 0], 4, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                     Finish('phong', 0.4, 'reflection', 0.2)))
-    small_vesicle_5 = Sphere([120, 0, 0], 5, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                     Finish('phong', 0.4, 'reflection', 0.2)))
+    small_vesicle_1 = Sphere([120, 0, 0], 3, VESICLE_TEXTURE)
+    small_vesicle_2 = Sphere([120, 0, 0], 5, VESICLE_TEXTURE)
+    small_vesicle_3 = Sphere([120, 0, 0], 2, VESICLE_TEXTURE)
+    small_vesicle_4 = Sphere([120, 0, 0], 4, VESICLE_TEXTURE)
+    small_vesicle_5 = Sphere([120, 0, 0], 5, VESICLE_TEXTURE)
 
     # Determine total frames of second part
-    total_frames_of_third_part =  ending_frame - starting_frame
+    total_frames_of_third_part = ending_frame - starting_frame
 
     # Determine in which step of the second part we are, starting with zero
     step_in_part = frame_number - (starting_frame + 1)
@@ -202,17 +197,25 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
         distance = start_coord - end_coord
         distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
-        small_vesicle_1 = Sphere([-x_coord, sin(x_coord/3), 0], 3, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                            Finish('phong', 0.4, 'reflection', 0.2)))
-        small_vesicle_2 = Sphere([x_coord, cos(x_coord/3), 0], 5, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                            Finish('phong', 0.4, 'reflection', 0.2)))
-        z_coord_camera = -150
+        small_vesicle_1 = Sphere([-x_coord, sin(x_coord/3), 0], 3, VESICLE_TEXTURE)
+        small_vesicle_2 = Sphere([x_coord, cos(x_coord/3), 0], 5, VESICLE_TEXTURE)
+        z_coord_camera = z_end_camera
 
     # In the third segment the radius of the big vesicle is increased
     elif step_in_part in range(two_fifth_of_part, three_fifth_of_part):
         step_in_segment = step_in_part - two_fifth_of_part
+
+        start_coord = 20
+        end_coord = 10
+        distance = end_coord - start_coord
+        distance_per_frame = distance / one_fifth_of_part
+        x_coord = start_coord - distance_per_frame * step_in_segment
+
+        small_vesicle_1 = Sphere([-x_coord, 0, 0], 3 - 3 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
+        small_vesicle_2 = Sphere([x_coord, 0, 0], 5 - 5 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
+
         radius_vesicle += radius_increase_per_frame * step_in_segment
-        z_coord_camera = -150
+        z_coord_camera = z_end_camera
 
     # In the fourth segment three small vesicles move towards the bigger vesicle
     elif step_in_part in range(three_fifth_of_part, four_fifth_of_part):
@@ -223,26 +226,38 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
         distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
         radius_vesicle = 30
-        small_vesicle_3 = Sphere([x_coord, sin(x_coord/3), 0], 2,
-                         Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
-        small_vesicle_4 = Sphere([sin(x_coord/3), x_coord, 0], 4,
-                         Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
-        small_vesicle_5 = Sphere([sin(x_coord/3), -x_coord, 0], 5,
-                         Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2)))
-        z_coord_camera = -150
+
+        small_vesicle_3 = Sphere([x_coord, sin(x_coord/3), 0], 2, VESICLE_TEXTURE)
+        small_vesicle_4 = Sphere([sin(x_coord/3), x_coord, 0], 4, VESICLE_TEXTURE)
+        small_vesicle_5 = Sphere([sin(x_coord/3), -x_coord, 0], 5, VESICLE_TEXTURE)
+
+        z_coord_camera = z_end_camera
 
     # In the last segment the radius of the bigger vesicle is increased
     elif step_in_part in range(four_fifth_of_part, total_frames_of_third_part):
+        step_in_segment = step_in_part - four_fifth_of_part
+
         radius_vesicle = 30
         part_in_scene = step_in_part - four_fifth_of_part
         radius_vesicle += radius_increase_per_frame * part_in_scene
-        z_coord_camera = -150
+        z_coord_camera = z_end_camera
+
+        start_coord = 30
+        end_coord = 40
+        distance = start_coord - end_coord
+        distance_per_frame = distance / one_fifth_of_part
+        x_coord = start_coord - distance_per_frame * step_in_segment
+
+        small_vesicle_3 = Sphere([x_coord, 0, 0], 2 - 2 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
+        small_vesicle_4 = Sphere([0, x_coord, 0], 4 - 4 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
+        small_vesicle_5 = Sphere([0, -x_coord, 0], 5 - 5 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
 
     # Making the big vesicle (as a Sphere object) with its newly given radius
-    vesicle = Sphere([0, 0, 0], radius_vesicle, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                            Finish('phong', 0.4, 'reflection', 0.2)))
+    vesicle = Sphere([0, 0, 0], radius_vesicle, VESICLE_TEXTURE)
 
-    return vesicle, z_coord_camera, small_vesicle_1, small_vesicle_2, small_vesicle_3, small_vesicle_4, small_vesicle_5
+    objects = [vesicle, small_vesicle_1, small_vesicle_2, small_vesicle_3, small_vesicle_4, small_vesicle_5]
+
+    return z_coord_camera, objects
 
 
 def create_fourth_part_of_the_animation(frame_number, starting_frame, ending_frame):
@@ -255,10 +270,8 @@ def create_fourth_part_of_the_animation(frame_number, starting_frame, ending_fra
     RNA_1.move_to([0, 0, 0])
 
     # Create vesicle (placed in center of scene) and a duplicate (placed out of scene)
-    vesicle = Sphere([0, 0, 0], 40, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                            Finish('phong', 0.4, 'reflection', 0.2)))
-    vesicle_2 = Sphere([200, 0, 0], 40, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                            Finish('phong', 0.4, 'reflection', 0.2)))
+    vesicle = Sphere([0, 0, 0], 40, VESICLE_TEXTURE)
+    vesicle_2 = Sphere([200, 0, 0], 40, VESICLE_TEXTURE)
 
     # Determining the total frames of the fourth part
     total_frames_of_fourth_part = ending_frame - starting_frame
@@ -308,10 +321,9 @@ def create_fourth_part_of_the_animation(frame_number, starting_frame, ending_fra
         step_in_segment = step_in_part - two_fifth_of_part
         radius -= radius_decrease_per_frame * step_in_segment
         x_coord = start_coord_rna_split - distance_rna_molecule_per_frame * step_in_segment
-        vesicle = Sphere([x_coord, 0, 0], radius, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                Finish('phong', 0.4, 'reflection', 0.2)))
-        vesicle_2 = Sphere([-x_coord, 0, 0], radius, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                    Finish('phong', 0.4, 'reflection', 0.2)))
+        vesicle = Sphere([x_coord, 0, 0], radius, VESICLE_TEXTURE)
+        vesicle_2 = Sphere([-x_coord, 0, 0], radius, VESICLE_TEXTURE)
+
         RNA_1.move_to([-end_coord_rna_split, 0, 0])
         RNA_2.move_to([end_coord_rna_split, 0, 0])
 
@@ -320,14 +332,15 @@ def create_fourth_part_of_the_animation(frame_number, starting_frame, ending_fra
         step_in_segment = step_in_part - four_fifth_of_part
         x_coord = start_coord_cell - distance_cell_per_frame * step_in_segment
 
-        vesicle = Sphere([x_coord, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                          Finish('phong', 0.4, 'reflection', 0.2)))
-        vesicle_2 = Sphere([-x_coord, 0, 0], 20, Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
-                                                             Finish('phong', 0.4, 'reflection', 0.2)))
+        vesicle = Sphere([x_coord, 0, 0], 20, VESICLE_TEXTURE)
+        vesicle_2 = Sphere([-x_coord, 0, 0], 20, VESICLE_TEXTURE)
+
         RNA_1.move_to([-x_coord, 0, 0])
         RNA_2.move_to([x_coord, 0, 0])
 
-    return vesicle, vesicle_2, camera_z
+    objects = [vesicle, vesicle_2]
+
+    return camera_z, objects
 
 
 def frame(step):
@@ -335,6 +348,9 @@ def frame(step):
     # Feedback to user in terminal about render status
     curr_time = step / eval(SETTINGS.NumberFrames) * eval(SETTINGS.FrameTime)
     logger.info(" @Time: %.3fs, Step: %d", curr_time, step)
+
+    render_objects = [models.default_light]
+    objects = None
 
     # Calculates the total frames of animation
     total_frames = eval(SETTINGS.NumberFrames)
@@ -346,15 +362,6 @@ def frame(step):
 
     # Obtain molecules from function
     create_molecules()
-
-    # Initializing different sizes of vesicles out of scene
-    small_vesicle_1 = Sphere([120, 0, 0], 3)
-    small_vesicle_2 = Sphere([120, 0, 0], 5)
-    small_vesicle_3 = Sphere([120, 0, 0], 2)
-    small_vesicle_4 = Sphere([120, 0, 0], 4)
-    small_vesicle_5 = Sphere([120, 0, 0], 5)
-    vesicle = Sphere([120, 0, 0], 5)
-    vesicle_2 = Sphere([200, 0, 0], 40)
 
     # Initializing two RNA molecules out of scene
     RNA_1.move_to([500, 0, 0])
@@ -369,30 +376,33 @@ def frame(step):
 
     # Sphere covering the RNA molecule in the next twenty percent of the animation
     elif step in range(thirty_percent_of_total_frames, fifty_percent_of_total_frames):
-        vesicle = create_second_part_of_animation(step, thirty_percent_of_total_frames, fifty_percent_of_total_frames)
+        objects = create_second_part_of_animation(step, thirty_percent_of_total_frames, fifty_percent_of_total_frames)
 
     # Vesicle growing in the next thirty percent of the animation
     elif step in range(fifty_percent_of_total_frames, eighty_percent_of_total_frames):
-        vesicle, camera_z, small_vesicle_1, small_vesicle_2, small_vesicle_3, \
-        small_vesicle_4, small_vesicle_5 = create_third_part_of_the_animation(step, fifty_percent_of_total_frames, eighty_percent_of_total_frames)
+        camera_z, objects = create_third_part_of_the_animation(step, fifty_percent_of_total_frames, eighty_percent_of_total_frames)
 
     # Replicating the RNA-molecule and the vesicle, becoming two individual cells with RNA
     elif step in range(eighty_percent_of_total_frames, total_frames):
-        vesicle, vesicle_2, camera_z = create_fourth_part_of_the_animation(step, eighty_percent_of_total_frames, total_frames)
+        camera_z, objects = create_fourth_part_of_the_animation(step, eighty_percent_of_total_frames, total_frames)
+
+    if objects is None:
+        return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
+                     objects=render_objects + NUCL_1.povray_molecule +
+                             NUCL_2.povray_molecule + NUCL_3.povray_molecule + NUCL_4.povray_molecule +
+                             NUCL_5.povray_molecule + NUCL_6.povray_molecule + NUCL_7.povray_molecule)
 
     # Return the Scene object for rendering
-    return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
-                 objects=[models.default_light, vesicle, vesicle_2, small_vesicle_1, small_vesicle_2,
-                          small_vesicle_3, small_vesicle_4, small_vesicle_5] + NUCL_1.povray_molecule +
-                         NUCL_2.povray_molecule + NUCL_3.povray_molecule + NUCL_4.povray_molecule +
-                         NUCL_5.povray_molecule + NUCL_6.povray_molecule + NUCL_7.povray_molecule +
-                         RNA_1.povray_molecule + RNA_2.povray_molecule)
+    else:
+        render_objects += objects
+        return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
+                     objects=render_objects + RNA_1.povray_molecule + RNA_2.povray_molecule)
 
 
 def main(args):
     """ Main function of this program """
     logger.info(" Total time: %d (frames: %d)", SETTINGS.Duration, eval(SETTINGS.NumberFrames))
-    pypovray.render_scene_to_mp4(frame,range(295, 480))
+    pypovray.render_scene_to_mp4(frame)
     return 0
 
 
