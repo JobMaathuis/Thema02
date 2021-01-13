@@ -2,6 +2,7 @@
 
 """
 
+Usage: python3 animation_first_cell.py
 """
 
 __author__ = 'Joukje Kloosterman, Job Maathuis'
@@ -12,6 +13,7 @@ from pypovray import pypovray, SETTINGS, models, pdb, logger
 from vapory import Scene, Camera, Sphere, Texture, Pigment, Finish
 
 VESICLE_TEXTURE = Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2))
+
 
 def create_molecules():
     """ Creates the molecules """
@@ -143,7 +145,7 @@ def create_second_part_of_animation(frame_number, thirty_percent_of_total_frames
 
 def create_third_part_of_the_animation(frame_number, starting_frame, ending_frame):
     """
-    In this function a RNA moleucle is placed in the center of the scene.
+    In this function a RNA molecule is placed in the center of the scene.
     The vesicle (a Sphere object) is placed over the molecule.
     Smaller vesicles move towards the big vesicle and makes the radius of the big vesicle larger.
     """
@@ -255,6 +257,7 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
     # Making the big vesicle (as a Sphere object) with its newly given radius
     vesicle = Sphere([0, 0, 0], radius_vesicle, VESICLE_TEXTURE)
 
+    # Making a list of objects that are created in the function
     objects = [vesicle, small_vesicle_1, small_vesicle_2, small_vesicle_3, small_vesicle_4, small_vesicle_5]
 
     return z_coord_camera, objects
@@ -338,17 +341,22 @@ def create_fourth_part_of_the_animation(frame_number, starting_frame, ending_fra
         RNA_1.move_to([-x_coord, 0, 0])
         RNA_2.move_to([x_coord, 0, 0])
 
+    # Creating a list with the objects that are made in this part
     objects = [vesicle, vesicle_2]
 
     return camera_z, objects
 
 
 def frame(step):
-    """ """
+    """
+    In this function, other functions are called.
+    Here it is also decided how long each part of the animation will be.
+    """
     # Feedback to user in terminal about render status
     curr_time = step / eval(SETTINGS.NumberFrames) * eval(SETTINGS.FrameTime)
     logger.info(" @Time: %.3fs, Step: %d", curr_time, step)
 
+    # Making variables for rendering a list of objects
     render_objects = [models.default_light]
     objects = None
 
@@ -386,6 +394,7 @@ def frame(step):
     elif step in range(eighty_percent_of_total_frames, total_frames):
         camera_z, objects = create_fourth_part_of_the_animation(step, eighty_percent_of_total_frames, total_frames)
 
+    # Returning nucleotides made in the first part
     if objects is None:
         return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
                      objects=render_objects + NUCL_1.povray_molecule +
