@@ -1,6 +1,13 @@
 # !/usr/bin/env python3
 
 """
+This program renders an animation of the origin of the first cell.
+
+The animation/program is divided into four parts:
+    1. Creation of a RNA-molecule
+    2. Encapsulation of the RNA-molecule by a vesicle
+    3. Growth of the vesicle by fusion with smaller vesicles
+    4. RNA and vesicle division
 
 Usage: python3 animation_first_cell.py
 """
@@ -12,31 +19,32 @@ from math import pi, sin, cos
 from pypovray import pypovray, SETTINGS, models, pdb, logger
 from vapory import Scene, Camera, Sphere, Texture, Pigment, Finish
 
-VESICLE_TEXTURE = Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6), Finish('phong', 0.4, 'reflection', 0.2))
+# Standard texture for the vesicles
+VESICLE_TEXTURE = Texture(Pigment('color', [0.7, 1, 1], 'filter', 0.6),
+                          Finish('phong', 0.4, 'reflection', 0.2))
 
 
 def create_molecules():
     """ Creates the molecules """
-    global NUCL_1, NUCL_2, NUCL_3, NUCL_4, NUCL_5, NUCL_6, NUCL_7, RNA_2, RNA_1
+    global NUCL_1, NUCL_2, NUCL_3, NUCL_4, NUCL_5, NUCL_6, NUCL_7, RNA_1, RNA_2
 
-    # Create first RNA molecule
+    # Create first RNA molecule with the right rotation
     RNA_1 = pdb.PDBMolecule('{}/pdb/RNA.pdb'.format(SETTINGS.AppLocation))
     RNA_1.rotate([0, 1, 1], [0, pi, pi])
 
-    # Create second RNA molecule
+    # Create second RNA molecule with the right rotation
     RNA_2 = pdb.PDBMolecule('{}/pdb/RNA.pdb'.format(SETTINGS.AppLocation))
     RNA_2.rotate([0, 1, 1], [0, pi, pi])
 
-    # Create RNA molecule for the making of nucleotides
+    # Create RNA molecule which is later divided into nucleotides
     rna_to_nucl = pdb.PDBMolecule('{}/pdb/RNA.pdb'.format(SETTINGS.AppLocation))
     rna_to_nucl.rotate([0, 1, 1], [0, pi, pi])
 
-    # Determine which atoms make the nucelotides
-    nucleotide_atoms = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-                        24, 25, 26, 27, 28, 29, 30, 31]
+    # Determine which atoms make the nucleotides
+    nucleotide_atoms = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+                        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
 
-    # Creating all the different molecules
+    # Creating all the different nucleotides
     NUCL_1 = rna_to_nucl.divide(nucleotide_atoms, 'nucleotide_1', offset=[-70, 0, 0])
     NUCL_2 = rna_to_nucl.divide(nucleotide_atoms, 'nucleotide_2', offset=[-70, 0, 0])
     NUCL_3 = rna_to_nucl.divide(nucleotide_atoms, 'nucleotide_3', offset=[-70, 0, 0])
@@ -46,12 +54,12 @@ def create_molecules():
     NUCL_7 = rna_to_nucl.divide(nucleotide_atoms, 'nucleotide_7', offset=[-70, 0, 0])
 
 
-def create_first_part_of_animation(frame_number, thirty_percent_of_total_frames):
+def create_first_part_of_animation(frame_number, ending_frame):
     """
     In this function nucleotides move into the scene creating a RNA molecule.
     """
     # Determine total frames of the first part of the animation
-    total_frames_of_first_part = thirty_percent_of_total_frames - 0
+    total_frames_of_first_part = ending_frame
 
     # Dividing the total frames of this segment into fifths
     one_fifth_of_part = total_frames_of_first_part // 5
@@ -111,16 +119,16 @@ def create_first_part_of_animation(frame_number, thirty_percent_of_total_frames)
         NUCL_7.move_offset([x_offset, 0, 0])
 
 
-def create_second_part_of_animation(frame_number, thirty_percent_of_total_frames, fifty_percent_of_total_frames):
+def create_second_part_of_animation(frame_number, starting_frame, ending_frame):
     """
     In this function the whole RNA molecule is placed in the center of the scene and
     a sphere is moved over the molecule as a vesicle.
     """
     # Determine total frames of the second part of the animation
-    total_frames_second_part = fifty_percent_of_total_frames - thirty_percent_of_total_frames
+    total_frames_second_part = ending_frame - starting_frame
 
     # Determine in which step of the second part we are, starting with zero
-    step_in_part = frame_number - (thirty_percent_of_total_frames + 1)
+    step_in_part = frame_number - (starting_frame + 1)
 
     # Place whole RNA molecule in the center of the scene
     RNA_1.move_to([0, 0, 0])
@@ -143,13 +151,13 @@ def create_second_part_of_animation(frame_number, thirty_percent_of_total_frames
     return [vesicle]
 
 
-def create_third_part_of_the_animation(frame_number, starting_frame, ending_frame):
+def create_third_part_of_animation(frame_number, starting_frame, ending_frame):
     """
     In this function a RNA molecule is placed in the center of the scene.
     The vesicle (a Sphere object) is placed over the molecule.
     Smaller vesicles move towards the big vesicle and makes the radius of the big vesicle larger.
     """
-    # Place whole RNA molecule in the center of the scene
+    # Placing of RNA molecule in the center of the scene
     RNA_1.move_to([0, 0, 0])
 
     # Creating the smaller vesicles and place them out of the scene
@@ -194,13 +202,17 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
     # In the second segment two small vesicles move towards the big vesicle
     elif step_in_part in range(one_fifth_of_part, two_fifth_of_part):
         step_in_segment = step_in_part - one_fifth_of_part
+
         end_coord = 20
         start_coord = 120
+
         distance = start_coord - end_coord
         distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
+
         small_vesicle_1 = Sphere([-x_coord, sin(x_coord/3), 0], 3, VESICLE_TEXTURE)
         small_vesicle_2 = Sphere([x_coord, cos(x_coord/3), 0], 5, VESICLE_TEXTURE)
+
         z_coord_camera = z_end_camera
 
     # In the third segment the radius of the big vesicle is increased
@@ -209,12 +221,15 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
 
         start_coord = 20
         end_coord = 10
+
         distance = end_coord - start_coord
         distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
 
-        small_vesicle_1 = Sphere([-x_coord, 0, 0], 3 - 3 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
-        small_vesicle_2 = Sphere([x_coord, 0, 0], 5 - 5 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
+        small_vesicle_1 = Sphere([-x_coord, 0, 0], 3 - 3 / one_fifth_of_part * step_in_segment,
+                                 VESICLE_TEXTURE)
+        small_vesicle_2 = Sphere([x_coord, 0, 0], 5 - 5 / one_fifth_of_part * step_in_segment,
+                                 VESICLE_TEXTURE)
 
         radius_vesicle += radius_increase_per_frame * step_in_segment
         z_coord_camera = z_end_camera
@@ -222,8 +237,10 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
     # In the fourth segment three small vesicles move towards the bigger vesicle
     elif step_in_part in range(three_fifth_of_part, four_fifth_of_part):
         step_in_segment = step_in_part - three_fifth_of_part
+
         end_coord = 30
         start_coord = 120
+
         distance = start_coord - end_coord
         distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
@@ -250,20 +267,24 @@ def create_third_part_of_the_animation(frame_number, starting_frame, ending_fram
         distance_per_frame = distance / one_fifth_of_part
         x_coord = start_coord - distance_per_frame * step_in_segment
 
-        small_vesicle_3 = Sphere([x_coord, 0, 0], 2 - 2 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
-        small_vesicle_4 = Sphere([0, x_coord, 0], 4 - 4 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
-        small_vesicle_5 = Sphere([0, -x_coord, 0], 5 - 5 / one_fifth_of_part * step_in_segment, VESICLE_TEXTURE)
+        small_vesicle_3 = Sphere([x_coord, 0, 0], 2 - 2 / one_fifth_of_part * step_in_segment,
+                                 VESICLE_TEXTURE)
+        small_vesicle_4 = Sphere([0, x_coord, 0], 4 - 4 / one_fifth_of_part * step_in_segment,
+                                 VESICLE_TEXTURE)
+        small_vesicle_5 = Sphere([0, -x_coord, 0], 5 - 5 / one_fifth_of_part * step_in_segment,
+                                 VESICLE_TEXTURE)
 
     # Making the big vesicle (as a Sphere object) with its newly given radius
     vesicle = Sphere([0, 0, 0], radius_vesicle, VESICLE_TEXTURE)
 
     # Making a list of objects that are created in the function
-    objects = [vesicle, small_vesicle_1, small_vesicle_2, small_vesicle_3, small_vesicle_4, small_vesicle_5]
+    objects = [vesicle, small_vesicle_1, small_vesicle_2,
+               small_vesicle_3, small_vesicle_4, small_vesicle_5]
 
     return z_coord_camera, objects
 
 
-def create_fourth_part_of_the_animation(frame_number, starting_frame, ending_frame):
+def create_fourth_part_of_animation(frame_number, starting_frame, ending_frame):
     """
     In this function a RNA-molecule is replicated, then the vesicle (as a Sphere object) is
     separated into two smaller vesicles, each vesicle containing a RNA-molecule.
@@ -356,7 +377,7 @@ def frame(step):
     curr_time = step / eval(SETTINGS.NumberFrames) * eval(SETTINGS.FrameTime)
     logger.info(" @Time: %.3fs, Step: %d", curr_time, step)
 
-    # Making variables for rendering a list of objects
+    # Initialising variables for rendering a list of objects
     render_objects = [models.default_light]
     objects = None
 
@@ -384,28 +405,31 @@ def frame(step):
 
     # Sphere covering the RNA molecule in the next twenty percent of the animation
     elif step in range(thirty_percent_of_total_frames, fifty_percent_of_total_frames):
-        objects = create_second_part_of_animation(step, thirty_percent_of_total_frames, fifty_percent_of_total_frames)
+        objects = create_second_part_of_animation(step, thirty_percent_of_total_frames,
+                                                  fifty_percent_of_total_frames)
 
     # Vesicle growing in the next thirty percent of the animation
     elif step in range(fifty_percent_of_total_frames, eighty_percent_of_total_frames):
-        camera_z, objects = create_third_part_of_the_animation(step, fifty_percent_of_total_frames, eighty_percent_of_total_frames)
+        camera_z, objects = create_third_part_of_animation(step, fifty_percent_of_total_frames,
+                                                           eighty_percent_of_total_frames)
 
     # Replicating the RNA-molecule and the vesicle, becoming two individual cells with RNA
     elif step in range(eighty_percent_of_total_frames, total_frames):
-        camera_z, objects = create_fourth_part_of_the_animation(step, eighty_percent_of_total_frames, total_frames)
+        camera_z, objects = \
+            create_fourth_part_of_animation(step, eighty_percent_of_total_frames, total_frames)
 
     # Returning nucleotides made in the first part
     if objects is None:
         return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
-                     objects=render_objects + NUCL_1.povray_molecule +
-                             NUCL_2.povray_molecule + NUCL_3.povray_molecule + NUCL_4.povray_molecule +
-                             NUCL_5.povray_molecule + NUCL_6.povray_molecule + NUCL_7.povray_molecule)
+                     objects=render_objects + NUCL_1.povray_molecule + NUCL_2.povray_molecule
+                     + NUCL_3.povray_molecule + NUCL_4.povray_molecule
+                     + NUCL_5.povray_molecule + NUCL_6.povray_molecule
+                     + NUCL_7.povray_molecule)
 
-    # Return the Scene object for rendering
-    else:
-        render_objects += objects
-        return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
-                     objects=render_objects + RNA_1.povray_molecule + RNA_2.povray_molecule)
+    # Return the Scene object for the other parts
+    render_objects += objects
+    return Scene(Camera('location', [0, 0, camera_z], 'look_at', [0, 0, 0]),
+                 objects=render_objects + RNA_1.povray_molecule + RNA_2.povray_molecule)
 
 
 def main(args):
